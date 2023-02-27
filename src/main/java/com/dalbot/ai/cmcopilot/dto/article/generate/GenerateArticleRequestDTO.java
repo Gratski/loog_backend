@@ -10,8 +10,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GenerateArticleRequestDTO {
-
-    private String prompt;
+    private String link;
+    private String atitude;
+    private Boolean includeImage;
     private String suffix;
-
 }

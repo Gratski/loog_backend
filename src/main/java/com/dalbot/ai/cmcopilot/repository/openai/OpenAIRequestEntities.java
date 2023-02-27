@@ -6,21 +6,10 @@ import lombok.Setter;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public class OpenAIRequestEntities {
-
-
-    @Getter
-    @Setter
-    @Builder
-    static class ImageGenerationRequest {
-        private String model;
-        private String prompt;
-        private int num_images;
-
-        // getters and setters
-    }
 
     @Getter
     @Setter
@@ -88,9 +77,32 @@ public class OpenAIRequestEntities {
 
         private String model;
 
-        private Collection<OpenAIChoices> choices;
+        private List<OpenAIChoices> choices;
 
         private OpenAIUsage usage;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class ImageGenerationRequest {
+        private String prompt;
+        private Integer n;
+        private String size;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class ImageGenerationResponse {
+        private Date created;
+        private List<ImageGenerationResponseImage> data;
+    }
+
+    @Getter
+    @Setter
+    public static class ImageGenerationResponseImage {
+        private String url;
     }
 
 }

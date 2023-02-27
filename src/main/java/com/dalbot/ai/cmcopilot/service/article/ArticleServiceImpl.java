@@ -14,6 +14,10 @@ import java.util.UUID;
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
+    private final String PROMPT_TEMPLATE = "Generate me a news article based on what is found in this link " +
+            "%s and demonstrate a " +
+            "%s opinion";
+
     @Value("${openai.api.key}")
     private String openAIApiKey;
     private final OpenAIRepository openAIRepository;
@@ -24,25 +28,50 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public GenerateArticleResponseDTO generateArticle(GenerateArticleRequestDTO dto) {
-        if(Objects.isNull(dto) | Objects.isNull(dto.getPrompt())) {
+        if(Objects.isNull(dto) | Objects.isNull(dto.getLink())) {
             throw new IllegalArgumentException("Article must contain the minimum required details");
         }
 
-        //todo: validar o length do prompt para gerir custos
+        String prompt = String.format(PROMPT_TEMPLATE, dto.getLink(), dto.getAtitude());
 
         OpenAIRequestEntities.TextCompletionRequest request = OpenAIRequestEntities
-                .TextCompletionRequest.createStandard(dto.getPrompt());
+                .TextCompletionRequest.createStandard(prompt);
         if(Objects.nonNull(dto.getSuffix())) {
             request.setSuffix(dto.getSuffix());
         }
 
-        OpenAIRequestEntities.TextCompletionResponse generatedText =
+        OpenAIRequestEntities.TextCompletionResponse fetchCompletionResult =
                 openAIRepository.completeText("Bearer " + openAIApiKey, request);
 
-        return GenerateArticleResponseDTO.builder()
-                .body(generatedText.getChoices())
+        String generatedText = (fetchCompletionResult.getChoices() != null && !fetchCompletionResult.getChoices().isEmpty())
+                ? fetchCompletionResult.getChoices().get(0).getText() : "The algorithm failed to generate an article. " +
+                "This operation won't be charged. Go ahead and try again!";
+
+        GenerateArticleResponseDTO result = GenerateArticleResponseDTO.builder()
+                .body(generatedText)
                 .build();
 
+        // call image generation api
+        if( Objects.nonNull(generatedText) && dto.getIncludeImage() != null && dto.getIncludeImage() ) {
+            String t = generatedText.replace("\n", "");
+            OpenAIRequestEntities.TextCompletionRequest summaryRequest = OpenAIRequestEntities
+                    .TextCompletionRequest.createStandard("Create a summary of this text for a 6 years old kid: " + generatedText);
+            summaryRequest.setMax_tokens(50);
+            OpenAIRequestEntities.TextCompletionResponse fetchSummaryCompletionResult =
+                    openAIRepository.completeText("Bearer " + openAIApiKey, summaryRequest);
+
+            OpenAIRequestEntities.ImageGenerationRequest createImageRequest = OpenAIRequestEntities.ImageGenerationRequest
+                    .builder()
+                    .prompt(fetchSummaryCompletionResult.getChoices().get(0).getText())
+                    .n(1)
+                    .size("1024x1024")
+                    .build();
+            OpenAIRequestEntities.ImageGenerationResponse createImageResult = openAIRepository.createImage(
+                    "Bearer " + openAIApiKey, createImageRequest);
+            result.setImageUrl(createImageResult.getData().get(0).getUrl());
+        }
+
+        return result;
     }
 
     @Override

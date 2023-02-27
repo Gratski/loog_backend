@@ -12,6 +12,9 @@ import java.util.Collection;
 @AllArgsConstructor
 public class GenerateArticleResponseDTO {
 
-    private Collection<OpenAIRequestEntities.OpenAIChoices> body;
+    private String body;
+
+    private String imageUrl;
+
 
 }

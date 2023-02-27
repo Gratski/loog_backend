@@ -22,4 +22,9 @@ public interface OpenAIRepository {
             @RequestHeader(HttpHeaders.AUTHORIZATION) String apiKey,
             OpenAIRequestEntities.TextCompletionRequest request);
 
+    @RequestMapping(method = RequestMethod.POST, value = "/v1/images/generations")
+    OpenAIRequestEntities.ImageGenerationResponse createImage(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String apiKey,
+            OpenAIRequestEntities.ImageGenerationRequest request);
+
 }
