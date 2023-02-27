@@ -20,7 +20,15 @@ public interface NewsAPIRepository {
     @RequestMapping(method = RequestMethod.GET, path = "/everything")
     public NewsAPIResponseDTO getNews(
             @RequestHeader(value = "X-API-KEY", required = true) String apiKey,
-            @RequestBody NewsAPIRequestDTO request
+            @RequestParam String q,
+            @RequestParam String searchIn,
+            @RequestParam String sources,
+            @RequestParam String language,
+            @RequestParam String sortBy,
+            @RequestParam Integer pageSize,
+            @RequestParam Integer page,
+            @RequestParam String from,
+            @RequestParam String to
     );
 
 }

@@ -13,16 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class GeneratorController {
-
     private final ArticleService articleService;
-
     private Logger logger = LoggerFactory.getLogger(GeneratorController.class);
 
     public GeneratorController(ArticleService articleService) {
         this.articleService = articleService;
     }
 
-    @PostMapping("/api/generator/text")
+    @PostMapping("/generator/text")
     public ResponseEntity<GenerateArticleResponseDTO> generateArticle(@RequestBody GenerateArticleRequestDTO article) {
         logger.debug("Generating article: Started-" + Thread.currentThread().getId());
         GenerateArticleResponseDTO generatedArticle = articleService.generateArticle(article);
