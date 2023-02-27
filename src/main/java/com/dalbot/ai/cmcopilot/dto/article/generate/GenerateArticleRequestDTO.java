@@ -12,5 +12,6 @@ import lombok.Setter;
 public class GenerateArticleRequestDTO {
 
     private String prompt;
+    private String suffix;
 
 }

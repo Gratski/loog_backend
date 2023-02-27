@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class ArticlesController {
+public class GeneratorController {
 
     private final ArticleService articleService;
 
-    private Logger logger = LoggerFactory.getLogger(ArticlesController.class);
+    private Logger logger = LoggerFactory.getLogger(GeneratorController.class);
 
-    public ArticlesController(ArticleService articleService) {
+    public GeneratorController(ArticleService articleService) {
         this.articleService = articleService;
     }
 

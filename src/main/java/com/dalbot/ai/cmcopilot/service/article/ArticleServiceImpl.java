@@ -30,16 +30,17 @@ public class ArticleServiceImpl implements ArticleService {
 
         //todo: validar o length do prompt para gerir custos
 
-        OpenAIRequestEntities.TextCompletionRequest request = OpenAIRequestEntities.TextCompletionRequest.builder()
-                .prompt(dto.getPrompt())
-                .max_tokens(1000)
-                .build();
+        OpenAIRequestEntities.TextCompletionRequest request = OpenAIRequestEntities
+                .TextCompletionRequest.createStandard(dto.getPrompt());
+        if(Objects.nonNull(dto.getSuffix())) {
+            request.setSuffix(dto.getSuffix());
+        }
 
         OpenAIRequestEntities.TextCompletionResponse generatedText =
-                openAIRepository.completeText(openAIApiKey,"davinci", request);
+                openAIRepository.completeText("Bearer " + openAIApiKey, request);
 
         return GenerateArticleResponseDTO.builder()
-                .body(generatedText.getText())
+                .body(generatedText.getChoices())
                 .build();
 
     }

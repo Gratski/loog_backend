@@ -1,6 +1,9 @@
 package com.dalbot.ai.cmcopilot.dto.article.generate;
 
+import com.dalbot.ai.cmcopilot.repository.openai.OpenAIRequestEntities;
 import lombok.*;
+
+import java.util.Collection;
 
 @Getter
 @Setter
@@ -9,6 +12,6 @@ import lombok.*;
 @AllArgsConstructor
 public class GenerateArticleResponseDTO {
 
-    private String body;
+    private Collection<OpenAIRequestEntities.OpenAIChoices> body;
 
 }
