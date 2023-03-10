@@ -14,7 +14,7 @@ import java.util.UUID;
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
-    private final String PROMPT_TEMPLATE = "Generate me a news article based on what is found in this link " +
+    private final String PROMPT_TEMPLATE = "Generate me a very comic article based on what is found in this link " +
             "%s and demonstrate a " +
             "%s opinion";
 
@@ -40,7 +40,7 @@ public class ArticleServiceImpl implements ArticleService {
             request.setSuffix(dto.getSuffix());
         }
 
-        OpenAIRequestEntities.TextCompletionResponse fetchCompletionResult =
+        OpenAIRequestEntities.GeneralResponse fetchCompletionResult =
                 openAIRepository.completeText("Bearer " + openAIApiKey, request);
 
         String generatedText = (fetchCompletionResult.getChoices() != null && !fetchCompletionResult.getChoices().isEmpty())
@@ -57,12 +57,14 @@ public class ArticleServiceImpl implements ArticleService {
             OpenAIRequestEntities.TextCompletionRequest summaryRequest = OpenAIRequestEntities
                     .TextCompletionRequest.createStandard("Create a summary of this text for a 6 years old kid: " + generatedText);
             summaryRequest.setMax_tokens(50);
-            OpenAIRequestEntities.TextCompletionResponse fetchSummaryCompletionResult =
+            OpenAIRequestEntities.GeneralResponse fetchSummaryCompletionResult =
                     openAIRepository.completeText("Bearer " + openAIApiKey, summaryRequest);
 
+            String summary = fetchSummaryCompletionResult.getChoices().get(0).getText();
+            result.setSummary(summary);
             OpenAIRequestEntities.ImageGenerationRequest createImageRequest = OpenAIRequestEntities.ImageGenerationRequest
                     .builder()
-                    .prompt(fetchSummaryCompletionResult.getChoices().get(0).getText())
+                    .prompt(summary)
                     .n(1)
                     .size("1024x1024")
                     .build();

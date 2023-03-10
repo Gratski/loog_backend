@@ -14,6 +14,8 @@ public class GenerateArticleResponseDTO {
 
     private String body;
 
+    private String summary;
+
     private String imageUrl;
 
 

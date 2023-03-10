@@ -1,13 +1,10 @@
 package com.dalbot.ai.cmcopilot.repository.openai;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.dalbot.ai.cmcopilot.dto.code.Message;
+import lombok.*;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class OpenAIRequestEntities {
 
@@ -29,7 +26,7 @@ public class OpenAIRequestEntities {
         public static TextCompletionRequest createStandard(String prompt) {
             return TextCompletionRequest.builder()
                     .temperature(0.7)
-                    .model("text-davinci-003")
+                    .model("gpt-3.5-turbo")
                     .top_p(0.0)
                     .prompt(prompt)
                     .n(1)
@@ -43,15 +40,49 @@ public class OpenAIRequestEntities {
     @Getter
     @Setter
     @Builder
+    public static class ChatCompletionRequest {
+        private String model;
+        private String messages;
+        private Double temperature;
+
+        public static ChatCompletionRequest createStandard(String messages) {
+            return ChatCompletionRequest.builder()
+                    .temperature(0.7)
+                    .model("gpt-3.5-turbo")
+                    .messages("[{\"role\":\"user\", \"content\":\""+messages+"\"}]")
+                    .build();
+        }
+
+    }
+
+    @Getter
+    @Setter
+    private static class ChatCompletionMessage {
+        String role;
+
+    }
+
+    @Getter
+    @Setter
+    @Builder
     public static class OpenAIChoices {
 
-        private String text;
-
         private Integer index;
+        private String text;
 
         private Object logprobs;
 
         private String finish_reason;
+
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class OpenAIChoicesChat {
+
+        private Integer index;
+        private Message message;
 
     }
 
@@ -69,17 +100,22 @@ public class OpenAIRequestEntities {
     @Getter
     @Setter
     @Builder
-    public static class TextCompletionResponse {
+    public static class GeneralResponse {
         private String id;
         private String object;
-
         private Date created;
-
         private String model;
-
         private List<OpenAIChoices> choices;
-
         private OpenAIUsage usage;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class ChatResponse {
+        private String id;
+        private List<OpenAIChoicesChat> choices;
+
     }
 
     @Getter
@@ -103,6 +139,16 @@ public class OpenAIRequestEntities {
     @Setter
     public static class ImageGenerationResponseImage {
         private String url;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class CodeAnalysisRequest {
+        private String input;
+        private String instruction;
+        private String model;
+        private Double temperature;
     }
 
 }

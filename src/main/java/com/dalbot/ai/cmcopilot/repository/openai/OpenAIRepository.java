@@ -1,11 +1,9 @@
 package com.dalbot.ai.cmcopilot.repository.openai;
 
-import feign.Headers;
-import feign.Param;
-import feign.RequestLine;
+import com.dalbot.ai.cmcopilot.dto.code.CodeAnalysisRequestDTO;
+import org.json.JSONObject;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,13 +16,25 @@ public interface OpenAIRepository {
                          OpenAIRequestEntities.ImageGenerationRequest request);
 
     @RequestMapping(method = RequestMethod.POST, value = "/v1/completions")
-    OpenAIRequestEntities.TextCompletionResponse completeText(
+    OpenAIRequestEntities.GeneralResponse completeText(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String apiKey,
             OpenAIRequestEntities.TextCompletionRequest request);
+
+    @RequestMapping(method = RequestMethod.POST, value = "/v1/chat/completions")
+    OpenAIRequestEntities.ChatResponse completeTextV2(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String apiKey,
+            CodeAnalysisRequestDTO request);
 
     @RequestMapping(method = RequestMethod.POST, value = "/v1/images/generations")
     OpenAIRequestEntities.ImageGenerationResponse createImage(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String apiKey,
             OpenAIRequestEntities.ImageGenerationRequest request);
+
+    @RequestMapping(method = RequestMethod.POST, value = "/v1/edits")
+    OpenAIRequestEntities.GeneralResponse codeAnalysis(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String apiKey,
+            OpenAIRequestEntities.CodeAnalysisRequest request
+    );
+
 
 }
