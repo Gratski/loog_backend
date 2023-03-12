@@ -3,7 +3,6 @@ package com.dalbot.ai.cmcopilot.controller;
 import com.dalbot.ai.cmcopilot.dto.code.CodeAnalysisRequestDTO;
 import com.dalbot.ai.cmcopilot.dto.code.CodeAnalysisResponseDTO;
 import com.dalbot.ai.cmcopilot.service.code.CodeService;
-import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +21,7 @@ public class CodeAnalysisController {
 
     @RequestMapping(path = "/analysis2", method = RequestMethod.POST)
     public ResponseEntity<CodeAnalysisResponseDTO> codeAnalysisReport2(@RequestBody CodeAnalysisRequestDTO dto){
-        String analysis = service.theMeaningOfLive(dto);
+        String analysis = service.performCodeAnalysis(dto);
         CodeAnalysisResponseDTO result = CodeAnalysisResponseDTO.builder()
                 .result(analysis)
                 .build();
