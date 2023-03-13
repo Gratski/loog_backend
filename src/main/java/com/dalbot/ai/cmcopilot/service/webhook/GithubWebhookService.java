@@ -23,6 +23,7 @@ import java.util.*;
 @Service
 public class GithubWebhookService {
 
+    private String API_KEY = "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";
     private final GithubRepository githubRepo;
 
     public GithubWebhookService(GithubRepository githubRepo) {
@@ -41,7 +42,7 @@ public class GithubWebhookService {
                 .payload(payload)
                 .build();
 
-        Optional<File> project = GithubUtils.cloneProject(repoUrl, pc.getId());
+        Optional<File> project = GithubUtils.cloneProject("gratski", API_KEY, repoUrl, pc.getId());
         pc.setProjectDirectory(project.orElseThrow());
         pc.setBuildTool(identifyBuildTool(pc));
         pc.setChangedFiles(identifyChangedFiles(pc));
@@ -141,12 +142,12 @@ public class GithubWebhookService {
     }
 
     private List<String> identifyChangedFiles(ProjectContext pc) {
-        BigInteger pullRequestId = pc.getPayload().getPull_request().getId();
+        Integer pullRequestId = pc.getPayload().getPull_request().getNumber();
         List<ChangedFile> changedFiles = githubRepo.GetPullRequestAffectedFiles(
-                "",
+                "Bearer "+ API_KEY,
                 pc.getPayload().getRepository().getOwner().getLogin(),
                 pc.getPayload().getRepository().getName(),
-                pullRequestId.toString());
+                pullRequestId);
         return null;
     }
 

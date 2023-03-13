@@ -27,6 +27,6 @@ public interface GithubRepository {
     List<ChangedFile> GetPullRequestAffectedFiles(@RequestHeader(HttpHeaders.AUTHORIZATION) String apiKey,
                                                   @PathVariable("repo") String repo,
                                                   @PathVariable("owner") String owner,
-                                                  @PathVariable("id") String id);
+                                                  @PathVariable("id") Integer id);
 }
 

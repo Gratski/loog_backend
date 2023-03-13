@@ -14,10 +14,10 @@ import java.util.UUID;
 
 public class GithubUtils {
 
-    public static Optional<File> cloneProject(final String repoUrl, UUID projectContextId) {
+    public static Optional<File> cloneProject(String username, String apiKey, final String repoUrl, UUID projectContextId) {
         String targetDirectory = String.format("%s/%s", getWorkingDirectory(), projectContextId.toString());
 
-        CredentialsProvider credentialProvider = new UsernamePasswordCredentialsProvider("gratski", "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");
+        CredentialsProvider credentialProvider = new UsernamePasswordCredentialsProvider(username, apiKey);
 
         try {
             Git.cloneRepository()
