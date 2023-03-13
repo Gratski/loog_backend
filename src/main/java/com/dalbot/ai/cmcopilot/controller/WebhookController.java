@@ -22,6 +22,7 @@ public class WebhookController {
 
     @PostMapping("/github/pr")
     public void captureGithubPullRequest(@RequestBody Map<String, Object> payload) throws IOException {
+        githubWBService.triggerPullRequestFlow(payload);
         System.out.println("The number of changed files: " + payload.size());
     }
 
