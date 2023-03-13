@@ -1,11 +1,15 @@
 package com.dalbot.ai.cmcopilot.dto.github.pr;
 
-import lombok.Builder;
+import lombok.*;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 
+@Getter
+@Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PullRequest {
     private String url;
     private BigInteger id;

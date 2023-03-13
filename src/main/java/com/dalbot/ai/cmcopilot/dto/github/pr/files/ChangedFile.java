@@ -1,12 +1,12 @@
 package com.dalbot.ai.cmcopilot.dto.github.pr.files;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChangedFile {
 
     private String sha;

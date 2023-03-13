@@ -1,8 +1,7 @@
 package com.dalbot.ai.cmcopilot.dto.github.pr;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -10,11 +9,16 @@ import java.util.ArrayList;
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Repository {
+
     private BigInteger id;
     private String node_id;
     private String name;
     private String full_name;
+    @JsonProperty("private")
+    private Boolean privado;
     private Owner owner;
     private String html_url;
     private String description;
@@ -89,5 +93,15 @@ public class Repository {
     private Integer open_issues;
     private Integer watchers;
     private String default_branch;
+
+    @JsonProperty("private")
+    public Boolean getPrivado() {
+        return privado;
+    }
+
+    @JsonProperty("private")
+    public void setPrivado(Boolean privado) {
+        this.privado = privado;
+    }
 
 }

@@ -28,7 +28,8 @@ public class GithubWebhookService {
     }
 
     public void triggerPullRequestFlow(GithubPullRequestPayload payload) throws IOException {
-        improveCodePerformance(payload, payload.getRepository().getUrl());
+        String repoUrl = payload.getRepository().getUrl().replace("/repos", "").replace("api.", "");
+        improveCodePerformance(payload, repoUrl);
     }
 
 

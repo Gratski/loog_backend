@@ -1,5 +1,6 @@
 package com.dalbot.ai.cmcopilot.controller;
 
+import com.dalbot.ai.cmcopilot.dto.github.pr.GithubPullRequestPayload;
 import com.dalbot.ai.cmcopilot.service.webhook.GithubWebhookService;
 import org.kohsuke.github.GHEventPayload;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,9 +22,8 @@ public class WebhookController {
     }
 
     @PostMapping("/github/pr")
-    public void captureGithubPullRequest(@RequestBody Map<String, Object> payload) throws IOException {
+    public void captureGithubPullRequest(@RequestBody GithubPullRequestPayload payload) throws IOException {
         githubWBService.triggerPullRequestFlow(payload);
-        System.out.println("The number of changed files: " + payload.size());
     }
 
     @PostMapping("/github/push")

@@ -1,12 +1,12 @@
 package com.dalbot.ai.cmcopilot.dto.github.pr;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class GithubPullRequestPayload {
     private String action;
     private float number;
