@@ -1,6 +1,6 @@
 package com.dalbot.ai.cmcopilot.service;
 
-import com.dalbot.ai.cmcopilot.dto.github.GithubPullRequestPayload;
+import com.dalbot.ai.cmcopilot.dto.github.pr.GithubPullRequestPayload;
 import com.dalbot.ai.cmcopilot.repository.github.GithubRepository;
 import com.dalbot.ai.cmcopilot.service.webhook.GithubWebhookService;
 import com.fasterxml.jackson.databind.ObjectMapper;

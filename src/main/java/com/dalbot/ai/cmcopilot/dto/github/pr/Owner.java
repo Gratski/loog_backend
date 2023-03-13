@@ -1,11 +1,11 @@
-package com.dalbot.ai.cmcopilot.dto.github;
+package com.dalbot.ai.cmcopilot.dto.github.pr;
 
 import lombok.Builder;
 
 import java.math.BigInteger;
 
 @Builder
-public class User {
+public class Owner {
     private String login;
     private BigInteger id;
     private String node_id;

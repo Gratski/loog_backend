@@ -1,4 +1,4 @@
-package com.dalbot.ai.cmcopilot.dto.github;
+package com.dalbot.ai.cmcopilot.dto.github.pr;
 
 import lombok.Builder;
 

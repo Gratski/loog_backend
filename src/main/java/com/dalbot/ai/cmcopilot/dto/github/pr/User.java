@@ -1,11 +1,13 @@
-package com.dalbot.ai.cmcopilot.dto.github;
+package com.dalbot.ai.cmcopilot.dto.github.pr;
 
 import lombok.Builder;
 
+import java.math.BigInteger;
+
 @Builder
-public class Sender {
+public class User {
     private String login;
-    private float id;
+    private BigInteger id;
     private String node_id;
     private String avatar_url;
     private String gravatar_id;
@@ -22,6 +24,5 @@ public class Sender {
     private String received_events_url;
     private String type;
     private Boolean site_admin;
-
 
 }
