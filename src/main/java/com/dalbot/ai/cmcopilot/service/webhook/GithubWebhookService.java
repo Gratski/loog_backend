@@ -49,7 +49,7 @@ public class GithubWebhookService {
         pc.setBuildTool(identifyBuildTool(pc));
         pc.setChangedFiles(identifyChangedFiles(pc));
         pc.setUnitTestFiles(identifyUnitTestFiles(pc, pc.getChangedFiles()));
-        
+
         if(pc.getChangedFiles().size() != pc.getUnitTestFiles().size()) {
             throw new IllegalArgumentException("" +
                     "The changed files are missing unit tests. " +
