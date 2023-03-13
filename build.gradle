@@ -21,7 +21,7 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.0.1'
-	implementation group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.5.2.RELEASE'
+	implementation 'io.github.cdimascio:java-dotenv:5.2.0'
 	implementation group: 'org.kohsuke', name: 'github-api', version: '1.314'
 	implementation group: 'org.json', name: 'json', version: '20230227'
 	implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.5.0.202303070854-r'

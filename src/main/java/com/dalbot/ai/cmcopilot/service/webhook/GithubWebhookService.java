@@ -9,13 +9,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.NameFileFilter;
 import org.apache.commons.io.output.TeeOutputStream;
 import org.apache.maven.shared.invoker.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
@@ -23,7 +23,8 @@ import java.util.*;
 @Service
 public class GithubWebhookService {
 
-    private String API_KEY = "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";
+    @Value("${github.api.key}")
+    private String githubApiKey;
     private final GithubRepository githubRepo;
 
     public GithubWebhookService(GithubRepository githubRepo) {
@@ -31,10 +32,10 @@ public class GithubWebhookService {
     }
 
     public void triggerPullRequestFlow(GithubPullRequestPayload payload) throws IOException {
-        improveCodePerformance(payload, payload.getRepository().getClone_url());
+        improveCodePerformance(payload);
     }
 
-    private void improveCodePerformance(GithubPullRequestPayload payload, String repoUrl) throws IOException {
+    private void improveCodePerformance(GithubPullRequestPayload payload) throws IOException {
         // BASE
         //download project to local system
         ProjectContext pc = ProjectContext.builder()
@@ -42,7 +43,8 @@ public class GithubWebhookService {
                 .payload(payload)
                 .build();
 
-        Optional<File> project = GithubUtils.cloneProject("gratski", API_KEY, repoUrl, pc.getId());
+        Optional<File> project = GithubUtils.cloneProject(
+                "gratski", githubApiKey, payload.getRepository().getClone_url(), pc.getId());
         pc.setProjectDirectory(project.orElseThrow());
         pc.setBuildTool(identifyBuildTool(pc));
         pc.setChangedFiles(identifyChangedFiles(pc));
@@ -144,7 +146,7 @@ public class GithubWebhookService {
     private List<String> identifyChangedFiles(ProjectContext pc) {
         Integer pullRequestId = pc.getPayload().getPull_request().getNumber();
         List<ChangedFile> changedFiles = githubRepo.GetPullRequestAffectedFiles(
-                "Bearer "+ API_KEY,
+                "Bearer "+ githubApiKey,
                 pc.getPayload().getRepository().getOwner().getLogin(),
                 pc.getPayload().getRepository().getName(),
                 pullRequestId);

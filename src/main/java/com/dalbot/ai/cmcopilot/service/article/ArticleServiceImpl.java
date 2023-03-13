@@ -18,7 +18,7 @@ public class ArticleServiceImpl implements ArticleService {
             "%s and demonstrate a " +
             "%s opinion";
 
-    @Value("Bearer: ${OPENAI_API_KEY}")
+    @Value("Bearer: ${openai.api.key}")
     private String openAIApiKey;
     private final OpenAIRepository openAIRepository;
 
