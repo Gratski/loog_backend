@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -86,7 +87,7 @@ public class CodeService {
     private boolean isPassingTests(ProjectContext pc) throws IOException {
         File outputLog = new File(pc.getProjectDirectory().getAbsolutePath(), "output.log");
         InvocationOutputHandler outputHandler = new PrintStreamHandler(
-                new PrintStream(new TeeOutputStream(System.out, Files.newOutputStream(outputLog.toPath())), true, "UTF-8"),
+                new PrintStream(new TeeOutputStream(System.out, Files.newOutputStream(outputLog.toPath())), true, StandardCharsets.UTF_8),
                 true);
         InvocationRequest mavenRequest = new DefaultInvocationRequest();
         mavenRequest.setPomFile(new File(String.format("%s/pom.xml", pc.getProjectDirectory())));
@@ -96,7 +97,7 @@ public class CodeService {
 
         Invoker mavenInvoker = new DefaultInvoker();
         File invokerLog = new File(pc.getProjectDirectory().getAbsolutePath(), "invoker.log");
-        PrintStreamLogger logger = new PrintStreamLogger(new PrintStream(new FileOutputStream(invokerLog), false, "UTF-8"),
+        PrintStreamLogger logger = new PrintStreamLogger(new PrintStream(new FileOutputStream(invokerLog), false, StandardCharsets.UTF_8),
                 InvokerLogger.DEBUG);
         mavenInvoker.setLogger(logger);
 
@@ -117,7 +118,7 @@ public class CodeService {
     }
 
     private List<String> extractUnitTestFiles(ProjectContext pc, List<String> changedFiles) {
-        List<String> testFilesPath = Collections.emptyList();
+        List<String> testFilesPath = new ArrayList<>();
 
         changedFiles.forEach(fname -> {
             //TODO: Remove the file extension, add "Test" word and add the file extension again
@@ -139,8 +140,7 @@ public class CodeService {
             boolean recursive = true;
             Collection<File> files = FileUtils.listFiles(root, null, recursive);
 
-            for (Iterator<File> iterator = files.iterator(); iterator.hasNext();) {
-                File file = (File) iterator.next();
+            for (File file : files) {
                 if (file.getName().equals(fname))
                     return file.getAbsolutePath();
             }
@@ -166,11 +166,7 @@ public class CodeService {
             return false;
         }
         String[] filesList = pc.getProjectDirectory().list(new NameFileFilter("pom.xml"));
-        if(filesList == null || filesList.length == 0) {
-            return false;
-        } else {
-            return true;
-        }
+        return filesList != null && filesList.length != 0;
     }
 
 }
