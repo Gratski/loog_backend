@@ -1,6 +1,7 @@
 package com.dalbot.ai.cmcopilot.service.code;
 
 import com.dalbot.ai.cmcopilot.dto.github.pr.GithubPullRequestPayload;
+import com.dalbot.ai.cmcopilot.dto.github.pr.files.ChangedFile;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +18,7 @@ public class ProjectContext {
     private UUID id;
     private GithubPullRequestPayload payload;
     private File projectDirectory;
-    private List<String> changedFiles;
+    private List<ChangedFile> changedFiles;
     private List<String> unitTestFiles;
     private BuildTool buildTool;
 

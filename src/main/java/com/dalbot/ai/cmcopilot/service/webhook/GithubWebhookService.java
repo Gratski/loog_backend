@@ -48,10 +48,8 @@ public class GithubWebhookService {
         pc.setProjectDirectory(project.orElseThrow());
         pc.setBuildTool(identifyBuildTool(pc));
         pc.setChangedFiles(identifyChangedFiles(pc));
-
-        // check if the changed files are being tested
-        // find unit tests for changed files (break if there are no tests found)
         pc.setUnitTestFiles(identifyUnitTestFiles(pc, pc.getChangedFiles()));
+        
         if(pc.getChangedFiles().size() != pc.getUnitTestFiles().size()) {
             throw new IllegalArgumentException("" +
                     "The changed files are missing unit tests. " +
@@ -110,12 +108,12 @@ public class GithubWebhookService {
         }
     }
 
-    private List<String> identifyUnitTestFiles(ProjectContext pc, List<String> changedFiles) {
+    private List<String> identifyUnitTestFiles(ProjectContext pc, List<ChangedFile> changedFiles) {
         List<String> testFilesPath = new ArrayList<>();
 
-        changedFiles.forEach(fname -> {
+        changedFiles.forEach(changedFile -> {
             //TODO: Remove the file extension, add "Test" word and add the file extension again
-            fname = fname + "Test";
+            String fname = changedFile.getFilename() + "Test";
             if(pc.getBuildTool() == ProjectContext.BuildTool.MAVEN) {
                 String filePath = filenameExists(
                         new File(pc.getProjectDirectory().getAbsolutePath() + "/src/test"), fname );
@@ -143,14 +141,13 @@ public class GithubWebhookService {
         }
     }
 
-    private List<String> identifyChangedFiles(ProjectContext pc) {
+    private List<ChangedFile> identifyChangedFiles(ProjectContext pc) {
         Integer pullRequestId = pc.getPayload().getPull_request().getNumber();
-        List<ChangedFile> changedFiles = githubRepo.GetPullRequestAffectedFiles(
+        return githubRepo.GetPullRequestAffectedFiles(
                 "Bearer "+ githubApiKey,
                 pc.getPayload().getRepository().getOwner().getLogin(),
                 pc.getPayload().getRepository().getName(),
                 pullRequestId);
-        return null;
     }
 
     private ProjectContext.BuildTool identifyBuildTool(ProjectContext pc) {

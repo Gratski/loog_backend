@@ -1,10 +1,7 @@
 package com.dalbot.ai.cmcopilot.repository.github;
 
-import com.dalbot.ai.cmcopilot.dto.code.CodeAnalysisRequestDTO;
 import com.dalbot.ai.cmcopilot.dto.github.pr.files.ChangedFile;
 import com.dalbot.ai.cmcopilot.dto.vendor.github.FetchCommitDTO;
-import com.dalbot.ai.cmcopilot.repository.openai.OpenAIRequestEntities;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,8 +22,8 @@ public interface GithubRepository {
 
     @RequestMapping(method = RequestMethod.GET, value = "/repos/{owner}/{repo}/pulls/{id}/files")
     List<ChangedFile> GetPullRequestAffectedFiles(@RequestHeader(HttpHeaders.AUTHORIZATION) String apiKey,
-                                                  @PathVariable("repo") String repo,
                                                   @PathVariable("owner") String owner,
+                                                  @PathVariable("repo") String repo,
                                                   @PathVariable("id") Integer id);
 }
 
