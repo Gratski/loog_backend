@@ -17,7 +17,7 @@ public class ProjectContext {
     private List<String> unitTestFiles;
     private BuildTool buildTool;
 
-    static enum BuildTool {
+    public static enum BuildTool {
         MAVEN,
         GRADLE
     }
