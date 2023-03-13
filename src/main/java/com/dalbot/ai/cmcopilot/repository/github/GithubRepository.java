@@ -4,6 +4,7 @@ import com.dalbot.ai.cmcopilot.dto.code.CodeAnalysisRequestDTO;
 import com.dalbot.ai.cmcopilot.dto.github.pr.files.ChangedFile;
 import com.dalbot.ai.cmcopilot.dto.vendor.github.FetchCommitDTO;
 import com.dalbot.ai.cmcopilot.repository.openai.OpenAIRequestEntities;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @FeignClient(name = "GithubRepository", url = "https://api.github.com")
 public interface GithubRepository {
+
     @RequestMapping(method = RequestMethod.GET, value = "/repos/{owner}/{repo}/commits/{id}")
     FetchCommitDTO getCommitById(@RequestHeader(HttpHeaders.AUTHORIZATION) String apiKey,
                                  @PathVariable("repo") String repo,

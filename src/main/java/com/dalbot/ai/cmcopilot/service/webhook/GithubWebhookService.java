@@ -1,6 +1,7 @@
 package com.dalbot.ai.cmcopilot.service.webhook;
 
 import com.dalbot.ai.cmcopilot.dto.github.pr.GithubPullRequestPayload;
+import com.dalbot.ai.cmcopilot.dto.github.pr.files.ChangedFile;
 import com.dalbot.ai.cmcopilot.repository.github.GithubRepository;
 import com.dalbot.ai.cmcopilot.service.code.ProjectContext;
 import com.dalbot.ai.cmcopilot.utils.GithubUtils;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
@@ -28,33 +30,25 @@ public class GithubWebhookService {
     }
 
     public void triggerPullRequestFlow(GithubPullRequestPayload payload) throws IOException {
-        String repoUrl = payload.getRepository().getUrl().replace("/repos", "").replace("api.", "");
-        improveCodePerformance(payload, repoUrl);
+        improveCodePerformance(payload, payload.getRepository().getClone_url());
     }
 
-
-    public void improveCodePerformance(GithubPullRequestPayload payload, String repoUrl) throws IOException {
-
+    private void improveCodePerformance(GithubPullRequestPayload payload, String repoUrl) throws IOException {
         // BASE
         //download project to local system
-        Optional<File> project =
-                GithubUtils.cloneProject(
-                        repoUrl,
-                        "/Users/joaorodrigues/Documents/software/projects/ai/cmcopilot/cmcopilot");
+        ProjectContext pc = ProjectContext.builder()
+                .id(UUID.randomUUID())
+                .payload(payload)
+                .build();
 
-        ProjectContext pc = project
-                .map(file -> ProjectContext.builder().projectDirectory(file).build())
-                .orElseThrow();
-
-        // find build tool to be used
-        pc.setBuildTool(extractBuildTool(pc));
-
-        // identify the files changes
-        pc.setChangedFiles(extractChangedFiles(payload));
+        Optional<File> project = GithubUtils.cloneProject(repoUrl, pc.getId());
+        pc.setProjectDirectory(project.orElseThrow());
+        pc.setBuildTool(identifyBuildTool(pc));
+        pc.setChangedFiles(identifyChangedFiles(pc));
 
         // check if the changed files are being tested
         // find unit tests for changed files (break if there are no tests found)
-        pc.setUnitTestFiles(extractUnitTestFiles(pc, pc.getChangedFiles()));
+        pc.setUnitTestFiles(identifyUnitTestFiles(pc, pc.getChangedFiles()));
         if(pc.getChangedFiles().size() != pc.getUnitTestFiles().size()) {
             throw new IllegalArgumentException("" +
                     "The changed files are missing unit tests. " +
@@ -113,7 +107,7 @@ public class GithubWebhookService {
         }
     }
 
-    private List<String> extractUnitTestFiles(ProjectContext pc, List<String> changedFiles) {
+    private List<String> identifyUnitTestFiles(ProjectContext pc, List<String> changedFiles) {
         List<String> testFilesPath = new ArrayList<>();
 
         changedFiles.forEach(fname -> {
@@ -146,11 +140,17 @@ public class GithubWebhookService {
         }
     }
 
-    private List<String> extractChangedFiles(GithubPullRequestPayload payload) {
+    private List<String> identifyChangedFiles(ProjectContext pc) {
+        BigInteger pullRequestId = pc.getPayload().getPull_request().getId();
+        List<ChangedFile> changedFiles = githubRepo.GetPullRequestAffectedFiles(
+                "",
+                pc.getPayload().getRepository().getOwner().getLogin(),
+                pc.getPayload().getRepository().getName(),
+                pullRequestId.toString());
         return null;
     }
 
-    private ProjectContext.BuildTool extractBuildTool(ProjectContext pc) {
+    private ProjectContext.BuildTool identifyBuildTool(ProjectContext pc) {
         if(isMaven(pc)){
             return ProjectContext.BuildTool.MAVEN;
         }

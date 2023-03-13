@@ -18,7 +18,7 @@ public class ArticleServiceImpl implements ArticleService {
             "%s and demonstrate a " +
             "%s opinion";
 
-    @Value("${openai.api.key}")
+    @Value("Bearer: ${OPENAI_API_KEY}")
     private String openAIApiKey;
     private final OpenAIRepository openAIRepository;
 
@@ -41,7 +41,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         OpenAIRequestEntities.GeneralResponse fetchCompletionResult =
-                openAIRepository.completeText("Bearer " + openAIApiKey, request);
+                openAIRepository.completeText(openAIApiKey, request);
 
         String generatedText = (fetchCompletionResult.getChoices() != null && !fetchCompletionResult.getChoices().isEmpty())
                 ? fetchCompletionResult.getChoices().get(0).getText() : "The algorithm failed to generate an article. " +
@@ -58,7 +58,7 @@ public class ArticleServiceImpl implements ArticleService {
                     .TextCompletionRequest.createStandard("Create a summary of this text for a 6 years old kid: " + generatedText);
             summaryRequest.setMax_tokens(50);
             OpenAIRequestEntities.GeneralResponse fetchSummaryCompletionResult =
-                    openAIRepository.completeText("Bearer " + openAIApiKey, summaryRequest);
+                    openAIRepository.completeText(openAIApiKey, summaryRequest);
 
             String summary = fetchSummaryCompletionResult.getChoices().get(0).getText();
             result.setSummary(summary);
@@ -69,7 +69,7 @@ public class ArticleServiceImpl implements ArticleService {
                     .size("1024x1024")
                     .build();
             OpenAIRequestEntities.ImageGenerationResponse createImageResult = openAIRepository.createImage(
-                    "Bearer " + openAIApiKey, createImageRequest);
+                    openAIApiKey, createImageRequest);
             result.setImageUrl(createImageResult.getData().get(0).getUrl());
         }
 
