@@ -125,13 +125,12 @@ public class GithubWebhookService {
                 }).toList();
     }
 
-    private String filenameExists(File root, String fname) {
+    private String filenameExists(File root, String filename) {
         try {
             boolean recursive = true;
             Collection<File> files = FileUtils.listFiles(root, null, recursive);
-
             for (File file : files) {
-                if (file.getName().equals(fname))
+                if (file.getName().equals(filename))
                     return file.getAbsolutePath();
             }
             return null;
