@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,7 +20,7 @@ public class ProjectContext {
     private GithubPullRequestPayload payload;
     private File projectDirectory;
     private List<ChangedFile> changedFiles;
-    private List<String> unitTestFiles;
+    private List<Path> unitTestFilesPath;
     private BuildTool buildTool;
 
     public static enum BuildTool {

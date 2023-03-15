@@ -1,9 +1,11 @@
 package com.dalbot.ai.cmcopilot.service.webhook;
 
 import com.dalbot.ai.cmcopilot.dto.github.pr.GithubPullRequestPayload;
+import com.dalbot.ai.cmcopilot.dto.github.pr.annotations.PerformanceAnalysis;
 import com.dalbot.ai.cmcopilot.dto.github.pr.files.ChangedFile;
 import com.dalbot.ai.cmcopilot.repository.github.GithubRepository;
 import com.dalbot.ai.cmcopilot.service.code.ProjectContext;
+import com.dalbot.ai.cmcopilot.utils.CodeUtils;
 import com.dalbot.ai.cmcopilot.utils.GithubUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.NameFileFilter;
@@ -18,7 +20,11 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.dalbot.ai.cmcopilot.utils.CodeUtils.hasElegibleCodeExtension;
 
 @Service
 public class GithubWebhookService {
@@ -48,13 +54,7 @@ public class GithubWebhookService {
         pc.setProjectDirectory(project.orElseThrow());
         pc.setBuildTool(identifyBuildTool(pc));
         pc.setChangedFiles(identifyChangedFiles(pc));
-        pc.setUnitTestFiles(identifyUnitTestFiles(pc, pc.getChangedFiles()));
-
-        if(pc.getChangedFiles().size() != pc.getUnitTestFiles().size()) {
-            throw new IllegalArgumentException("" +
-                    "The changed files are missing unit tests. " +
-                    "Unit tests are required for all files for code performance improvement operations");
-        };
+        pc.setUnitTestFilesPath(identifyUnitTestFiles(pc, pc.getChangedFiles()));
 
         // STEP 1 (original)
         // execute unit tests and store metrics
@@ -63,8 +63,6 @@ public class GithubWebhookService {
         }
 
         // STEP 2 (generated code for improvements)
-
-
         // genetic algorithm to improve code performance
         //// generate a better code using the same imports (something that should change over time V2 maybe)
         //// run the existing unit tests and store the metrics
@@ -77,15 +75,21 @@ public class GithubWebhookService {
 
     private boolean isPassingTests(ProjectContext pc) throws IOException {
         File outputLog = new File(pc.getProjectDirectory().getAbsolutePath(), "output.log");
+
         InvocationOutputHandler outputHandler = new PrintStreamHandler(
                 new PrintStream(new TeeOutputStream(System.out, Files.newOutputStream(outputLog.toPath())), true, StandardCharsets.UTF_8),
                 true);
+
         InvocationRequest mavenRequest = new DefaultInvocationRequest();
         mavenRequest.setPomFile(new File(String.format("%s/pom.xml", pc.getProjectDirectory())));
-        // TODO fix this code to be printed with comma separation
-        mavenRequest.setGoals(Collections.singletonList("test -Dtest " + pc.getUnitTestFiles().toString()));
+        mavenRequest.setGoals(Collections.singletonList("test -Dtest " +
+                        pc.getUnitTestFilesPath().stream()
+                            .map(path -> path.getFileName().toFile().getName())
+                            .collect(Collectors.joining(" ", "", ","))
+                        ));
         mavenRequest.setOutputHandler(outputHandler);
 
+        // TODO fix this code to be printed with comma separation
         Invoker mavenInvoker = new DefaultInvoker();
         File invokerLog = new File(pc.getProjectDirectory().getAbsolutePath(), "invoker.log");
         PrintStreamLogger logger = new PrintStreamLogger(new PrintStream(new FileOutputStream(invokerLog), false, StandardCharsets.UTF_8),
@@ -108,22 +112,17 @@ public class GithubWebhookService {
         }
     }
 
-    private List<String> identifyUnitTestFiles(ProjectContext pc, List<ChangedFile> changedFiles) {
-        List<String> testFilesPath = new ArrayList<>();
-
-        changedFiles.forEach(changedFile -> {
-            //TODO: Remove the file extension, add "Test" word and add the file extension again
-            String fname = changedFile.getFilename() + "Test";
-            if(pc.getBuildTool() == ProjectContext.BuildTool.MAVEN) {
-                String filePath = filenameExists(
-                        new File(pc.getProjectDirectory().getAbsolutePath() + "/src/test"), fname );
-                if(filePath != null) {
-                    testFilesPath.add(filePath);
-                }
-            }
-        });
-
-        return testFilesPath;
+    @PerformanceAnalysis
+    private List<Path> identifyUnitTestFiles(ProjectContext pc, List<ChangedFile> changedFiles) {
+        return changedFiles.stream()
+                .filter(file -> hasElegibleCodeExtension(file.getFilename()))
+                .map(file -> {
+                    try {
+                        return CodeUtils.identifyTestFilename(pc, file.getFilename());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList();
     }
 
     private String filenameExists(File root, String fname) {
