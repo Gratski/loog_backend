@@ -2,6 +2,7 @@ package com.dalbot.ai.cmcopilot.utils;
 
 import com.dalbot.ai.cmcopilot.exception.code.MissingUnitTestFile;
 import com.dalbot.ai.cmcopilot.service.code.ProjectContext;
+import org.apache.logging.log4j.util.Strings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,6 +20,9 @@ public class CodeUtils {
     }
 
     public static Boolean hasElegibleCodeExtension(String filename) {
+        if (Strings.isEmpty(filename)){
+            return false;
+        }
         String[] tokens = filename.split("\\.");
         String fileExtension = tokens[tokens.length - 1];
         return codeExtensions.containsKey(fileExtension);
@@ -36,6 +40,9 @@ public class CodeUtils {
      */
     public static Path identifyTestFilename(ProjectContext pc, String testFilename) throws IOException {
         // Find the first file that ends with the specified test file name
+        if(pc.getProjectDirectory() == null) {
+            return null;
+        }
         return Files.find(
                         pc.getProjectDirectory().toPath(),
                         Integer.MAX_VALUE,
